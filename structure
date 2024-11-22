@@ -1,0 +1,63 @@
+.
+├── .github/
+│   └── workflows/
+│       ├── ml-pipeline.yml
+│       └── code-quality.yml
+├── .gitignore
+├── Dockerfile
+├── Makefile
+├── README.md
+├── requirements.txt
+├── setup.py
+├── infrastructure/
+│   ├── terraform/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   └── k8s/
+│       ├── model-deployment.yaml
+│       └── monitoring.yaml
+├── scripts/
+│   ├── validate_data.py
+│   ├── train.py
+│   ├── evaluate.py
+│   ├── log_metrics.py
+│   ├── compare_models.py
+│   ├── deploy.py
+│   ├── update_registry.py
+│   ├── deploy_endpoints.py
+│   ├── smoke_tests.py
+│   ├── setup_monitoring.py
+│   └── configure_alerts.py
+├── src/
+│   ├── __init__.py
+│   ├── data/
+│   │   ├── __init__.py
+│   │   ├── data_loader.py
+│   │   └── data_validator.py
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── model.py
+│   │   └── evaluation.py
+│   ├── monitoring/
+│   │   ├── __init__.py
+│   │   ├── metrics.py
+│   │   └── alerts.py
+│   └── utils/
+│       ├── __init__.py
+│       ├── config.py
+│       └── logging.py
+├── tests/
+│   ├── __init__.py
+│   ├── test_data_validation.py
+│   ├── test_model.py
+│   └── test_deployment.py
+└── configs/
+    ├── data_validation/
+    │   └── expectations.json
+    ├── model/
+    │   ├── model_config.yaml
+    │   └── hyperparameters.json
+    └── monitoring/
+        ├── prometheus.yml
+        └── grafana-dashboard.json
