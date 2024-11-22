@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-serving
+  namespace: ml-serving
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: model-serving
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: model-serving
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: model-serving
+        image: ${ECR_REGISTRY}/model-serving:${MODEL_VERSION}
+        resources:
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        env:
+        - name: MODEL_PATH
+          value: "/models/current"
+        - name: AWS_DEFAULT_REGION
+          value: "${AWS_REGION}"
+        - name: MONITORING_ENABLED
+          value: "true"
+        volumeMounts:
+        - name: model-volume
+          mountPath: /models
+      volumes:
+      - name: model-volume
+        persistentVolumeClaim:
+          claimName: model-storage
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-serving
+  namespace: ml-serving
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: model-serving
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: model-serving
+  namespace: ml-serving
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: model-serving
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
