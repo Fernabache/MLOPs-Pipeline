@@ -1,4 +1,3 @@
-# MLOPs-Pipeline
 # MLOps Pipeline Integration
 
 This repository provides a complete MLOps pipeline that integrates with traditional CI/CD workflows. It includes automated training, validation, deployment, and monitoring of machine learning models.
